@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco de Dados Pessoais</title>
+</head>
+<style>
+    body {
+        background-color: black;
+        text-align: center;
+        
+    }
+    .card {
+        border: 2px solid white;
+        padding: 15px;
+        margin: 15px;
+        width: 210px;
+        display: inline-block;
+        text-align: center;
+        transition: transform 0.3s ease;
+        color: white;
+        border-radius: 8px;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+        z-index: 1;
+    }
+
+    h1 {
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        text-decoration:underline;
+        color: blueviolet;
+    }
+
+    .box {
+        display: block;
+        unicode-bidi: isolate;
+        
+    }
+
+    .box input {
+        padding: 10px;
+        width: 300px;
+        font-size: 16px;
+        border-radius: 10px;
+        border-color: blueviolet;
+    }
+   
+   .box button {
+    padding: 10px 15px;
+    font-size: 16px;
+    margin-left: 5px;
+    gap: 5px;
+    border-radius: 10px;
+    color: rgb(238, 236, 241);
+    background-color: blueviolet;
+   }
+
+   .card.selected {
+    background-color: #6a0dad;
+    color:wheat;
+    border-color: wheat;
+    transition: background-color 0.3s, color 0.3s;
+   }
+</style>
+<body>
+    <h1>Banco de Dados Pessoais</h1>
+    <div class="box">
+    <input type="text" id="search" placeholder="Pesquisar por nome ou país" style="text-align: center;" onkeyup="searchPeople()">
+    </div>
+    <br><br>
+    <div id="container"></div>
+
+    <script>
+    function adicionarCard() {
+        fetch('https://randomuser.me/api/?results=20')
+                .then(response => {
+                    if (!response.ok) throw new Error('Erro ao buscar dados da API');
+                    return response.json();
+                })
+                .then(data => {
+                    data.results.forEach(user => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                <img src="${user.picture.large}" alt="Foto">
+                <h3>Nome:${user.name.first} ${user.name.last}</h3>
+                <p>País:${user.location.country}</p>
+                <p>Login:${user.login.username}</p>
+                `;
+                
+                card.addEventListener('click', () => {
+                    card.classList.toggle('selected');
+                });
+
+                document.getElementById('container').appendChild(card);    
+                    });
+                })             
+                .catch(error => console.error(error));
+
+                }
+
+            adicionarCard();
+
+    function searchPeople() {
+        const input = document.getElementById('search').value.toLowerCase();
+        const cards = document.querySelectorAll('.card');
+
+        cards.forEach(card => {
+            const name = card.querySelector('h3').textContent.toLowerCase();
+            const country = card.querySelector('p:nth-child(3)').textContent.toLowerCase();
+
+            if (name.includes(input) || country.includes(input)) {
+                card.style.display = 'inline-block';
+            } else {
+                card.style.display = 'none';
+            }
+        })
+    }
+    </script>
+</body>
+</html>
